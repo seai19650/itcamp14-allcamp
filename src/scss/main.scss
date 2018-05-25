@@ -1,0 +1,76 @@
+$main-green: rgb(31, 136, 17);
+
+@import url('https://fonts.googleapis.com/css?family=Kanit');
+
+.btn-spread {
+    width: 100%;
+    color: #fff;
+}
+
+.column-btn {
+    width: 70px;
+}
+
+.btn-theme-1 {
+  background: linear-gradient(90deg,#323598 10%,#5155fe 90%);
+  border-radius: 20px;
+  padding: 8px 20px;
+  border: none;
+  &.green {
+    background: linear-gradient(90deg,#c4b700 10%,#d83911 90%);    
+  }
+  &.dark {
+    background: linear-gradient(90deg,#2e2b00 10%,#3b3b3b 90%);    
+  }
+}
+
+.console-header {
+  border-left: 5px solid #000;
+  padding-left: 10px;
+  text-align: left;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    min-height: 100vh;
+    background: rgba(0,0,0,0.8);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .content {
+      width: 90vw;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 0.25em;
+      position: relative;
+      display: block;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .btn-group {
+      margin-bottom: 3px;
+      .btn {
+        margin: 3px;
+        float: left;
+        position: relative;
+        display: block;
+        border: none;
+        padding: 1em 2em;
+        color: #fff;
+        border-radius: 0.25em;
+        text-align: center;
+      }
+    }
+  }
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
