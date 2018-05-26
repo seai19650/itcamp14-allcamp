@@ -1,5 +1,5 @@
 <template>
-  <div @click="handleState" :class="[{'win': state},'col-12 player m-1']">
+  <div @click="handleState" v-if="isReady" :class="[{'win': status},'col-12 player m-1']">
     <div class="row">
       <div class="col">
         <h6 class="text-left">{{ users[player].name }}</h6>
@@ -24,12 +24,10 @@ export default {
   },
   mounted () {
     this.getUsers()
-    this.state = this.status
   },
   methods: {
     getUsers () {
       firestore().collection('users').onSnapshot(snapshot => {
-        this.state = this.status
         let tmp = {}
         snapshot.forEach(doc => {
           tmp[doc.id] = doc.data()
@@ -51,8 +49,8 @@ export default {
     }
   },
   computed: {
-    state () {
-      return this.status
+    isReady () {
+      return this.users !== null
     }
   }
 }

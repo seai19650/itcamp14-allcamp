@@ -1,7 +1,7 @@
 <template>
   <div id="profile-card" v-if="userDetail != null" style="min-height: 100vh" class="container-fluid flex-center">
     <div class="container my-3 my-md-5 profile">
-      <user :user="userDetail"/>
+      <user :user="userDetail" :energy="userDetail.energy"/>
       <hr>
       <items :userItem="userDetail.item" :state="noItem"/>
       <hr>
@@ -24,6 +24,16 @@
             Logout
           </button>
         </div>
+      </div>
+    </div>
+    <div id="in-process" class="overlay" v-if="userDetail.inProcess !== null">
+      <div class="content py-3 px-2">
+        <h3 class="processing">{{ userDetail.inProcess.header }}<span>.</span><span>.</span><span>.</span></h3>
+        <hr>
+        <p>{{ userDetail.inProcess.msg }}</p>
+        <hr>
+        <p v-if="!userDetail.inProcess.controlable" class="text-muted">ระหว่างการเข้าร่วมเควส ผู้ใช้ไม่สามารถดำเนินการใดๆกับระบบได้ ระบบจะเข้าสู่โหมดปกติเมื่อเควสได้สิ้นสุดลง</p>
+        <button @click="closeMessage" v-else class="btn btn-theme-1 btn-spread">ปิด</button>
       </div>
     </div>
   </div>
@@ -52,15 +62,17 @@ export default {
     if (this.id !== undefined) {
       this.uid = this.id
     }
-    console.log('Profile for ' + this.uid)    
+    console.log('Profile for ' + this.uid)
     this.getUserData()
   },
   methods: {
+    closeMessage () {
+      firestore().collection('users').doc(this.userDetail.uid).update({inProcess: null})
+    },
     logOut () {
       auth().signOut().then(() => {
         window.localStorage.removeItem('itcamp-wallet')
         window.localStorage.setItem('justOut', true)
-        window.localStorage.removeItem('accId')        
         this.$router.replace('login')
       })
     },
@@ -107,5 +119,74 @@ export default {
   .profile {
     margin: 0;
   }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 100vh;
+  background: rgba(0,0,0,0.8);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .content {
+    width: 90vw;
+    max-width: 400px;
+    background: #fff;
+    border-radius: 0.25em;
+    position: relative;
+    display: block;
+  }
+  .img-info {
+    max-width: 250px;
+    height: auto;
+  }
+  .desc {
+    margin-top: 2px;
+  }
+  .btn-group {
+    margin-bottom: 3px;
+    .btn {
+      margin: 3px;
+      float: left;
+      position: relative;
+      display: block;
+      border: none;
+      padding: 1em 2em;
+      color: #fff;
+      border-radius: 0.25em;
+      text-align: center;
+    }
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: .2;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: .2;
+  }
+}
+
+.processing span {
+  animation-name: blink;
+  animation-duration: 1.4s;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
+.processing span:nth-child(2) {
+  animation-delay: .2s;
+}
+
+.processing span:nth-child(3) {
+  animation-delay: .4s;
 }
 </style>

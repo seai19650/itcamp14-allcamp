@@ -16,15 +16,13 @@
 </template>
 
 <script>
-import { auth, firestore, storage } from 'firebase'
-import { mapActions, mapGetters } from 'vuex'
+import { auth, firestore } from 'firebase'
 export default {
   name: 'Login',
   data () {
     return {
       user: undefined,
-      loggingIn: false,
-      accId: null
+      loggingIn: false
     }
   },
   mounted () {
@@ -34,28 +32,24 @@ export default {
       window.localStorage.removeItem('loggingIn')
     }
     auth().getRedirectResult().then(function (result) {
-
       /* Prevent Unwanted Redirect to process auth */
       if (window.localStorage.getItem('justOut') || result.user === null) {
         window.localStorage.removeItem('justOut')
-        return
       } else {
         console.log('Auth Redirection triggered.')
-
         /* Set it up */
         let self1 = self
         let inner = self1
         let user = result.user
         let data
-
         firestore().collection('uid-matching').doc(user.providerData[0].uid).get().then(uid => {
           self1.user = uid.data()
-          let self2 = inner          
+          let self2 = inner
           firestore().collection('users').doc(user.providerData[0].uid).get().then(account => {
             if (!account.exists) {
               console.log('Creating a new user.')
               if (self2.user === undefined) {
-                console.log('No matching UID.')              
+                console.log('No matching UID.')
                 self2.$router.replace('contact/' + user.providerData[0].uid)
               } else {
                 data = {
@@ -69,6 +63,11 @@ export default {
                   health: 3,
                   doneQuest: [],
                   item: {},
+                  inProcess: {
+                    controlable: true,
+                    header: 'สวัสดีนะ!',
+                    msg: 'ยินดีต้อนรับเข้าสู่ IT CAMP 14 ครับ!'
+                  },
                   numId: self2.user.numId,
                   mode: (self2.user === undefined) ? null : (self2.user.player) ? 'player' : 'controller'
                 }

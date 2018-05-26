@@ -154,8 +154,7 @@ export default {
             payload[self.add.id] = parseInt(item[self.add.id]) - parseInt(self.add.quantity)
           }
         }
-        
-        firestore().collection('users').doc(self.selectedPlayer.uid).update({item: payload})        
+        firestore().collection('users').doc(self.selectedPlayer.uid).update({item: payload})
       })
       this.displayPlayer()
     },
@@ -194,7 +193,7 @@ export default {
     },
     displayPlayer () {
       this.selectedPlayer = null
-      for (let i = 0; i<Object.keys(this.users).length; i++) {
+      for (let i = 0; i < Object.keys(this.users).length; i++) {
         if (this.playerId === this.users[Object.keys(this.users)[i]].numId) {
           this.selectedPlayer = this.users[Object.keys(this.users)[i]]
           break

@@ -41,7 +41,7 @@ export default {
   methods: {
     setWall () {
       window.localStorage.setItem('justOut', true)
-      this.$router.replace('/login')     
+      this.$router.replace('/login')
     }
   }
 }

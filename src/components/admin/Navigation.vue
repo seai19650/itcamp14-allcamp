@@ -70,7 +70,7 @@ export default {
   methods: {
     logOut () {
       auth().signOut().then(() => {
-        window.localStorage.removeItem('itcamp-wallet')        
+        window.localStorage.removeItem('itcamp-wallet')
         window.localStorage.setItem('justOut', true)
         this.$router.replace('/login')
       })

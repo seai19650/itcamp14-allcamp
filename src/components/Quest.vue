@@ -14,6 +14,17 @@
             <div class="col">
               <p>{{quest.description}}</p>
               <hr>
+              <div class="row">
+                <div class="col">
+                  <h5 class="text-info">NPC</h5>
+                  <p class="mb-0">{{ quest.npc }}</p>
+                </div>
+                <div class="col">
+                  <h5 class="text-info">สถานที่รับเควส</h5>
+                  <p class="mb-0">{{ quest.place }}</p>
+                </div>
+              </div>
+              <hr>
               <p>
                 ใช้ <b>{{quest.requiredEnergy}}</b> energy
                 <span v-if="quest.redo"> | สามารถทำซ้ำได้</span>
@@ -31,6 +42,9 @@
               <h5 class="text-info">ของรางวัล</h5>
               <p class="m-1 text-muted" v-if="quest.prize.length === 0">ไม่มีของรางวัล</p>
               <p v-else :class="['m-1']" v-for="(data,key) in quest.prize" :key="key">{{data.name}} : {{data.count}}</p>
+              <hr>
+              <h5 class="text-info">รางวัล Energy</h5>
+              <p class="m-1">{{ quest.payEnergy }}</p>
               <hr>
             </div>
           </div>
@@ -88,6 +102,16 @@ export default {
       let player = {}
       player[this.user.uid] = false
 
+      firestore().collection('users').doc(this.user.uid).update(
+        {
+          inProcess: {
+            controlable: false,
+            header: 'อยู่ในเควส',
+            msg: 'กำลังเข้าร่วมเควส' + this.quest.name
+          }
+        }
+      )
+
       if (!this.quest.redo) {
         this.user.doneQuest.push(this.id)
       }
@@ -118,7 +142,7 @@ export default {
         requiredItem[item.id] = item.count
       })
 
-      /* assume that player can join then check against it*/
+      /* assume that player can join then check against it */
       let state = true
       Object.keys(requiredItem).forEach((item) => {
         if (this.hasItem[item] === undefined || this.hasItem[item] < requiredItem[item]) {

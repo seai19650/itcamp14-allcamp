@@ -20,7 +20,7 @@
               <div class="row">
                 <div class="col">
                   <div class="wall">
-                    <img class="img-info" :src="item.img" alt="">                    
+                    <img class="img-info" :src="item.img" alt="">
                   </div>
                 </div>
               </div>

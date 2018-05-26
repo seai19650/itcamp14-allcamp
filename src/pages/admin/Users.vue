@@ -11,6 +11,7 @@
         <table class="table table-striped">
           <thead>
             <tr>
+              <th>ID</th>
               <th>Name</th>
               <th>Mode</th>
               <th>Action</th>
@@ -18,6 +19,7 @@
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.id">
+              <td>{{ user.numId }}</td>
               <td>{{ user.name }}</td>
               <td>
                 <div class="form-group mb-0">

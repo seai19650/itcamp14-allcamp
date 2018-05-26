@@ -64,7 +64,7 @@
             <div class="form-group col-6">
               <label for="place">สถานที่</label>
               <input class="center-form form-control" id="place" type="text" v-model="edit.place">
-            </div>           
+            </div>
             <div class="form-group col-12">
               <label for="requiredItem">ไอเทมที่ต้องการ</label>
               <multiselect
@@ -87,7 +87,7 @@
                   <input class="form-control" type="text" name="count" v-model="requiredItem.count">
                 </div>
               </div>
-            </div>                    
+            </div>
             <div class="form-group col-12">
               <label for="prize">ของรางวัล</label>
               <multiselect
@@ -118,14 +118,14 @@
             <div class="form-group col-6">
               <label for="payEnergy">ให้ Energy</label>
               <input @keypress="validateEnergy" class="center-form form-control" id="payEnergy" type="text" v-model="edit.payEnergy">
-            </div>                       
+            </div>
             <div class="text-left form-group col-12 mt-2">
               <input id="flush" type="checkbox" v-model="edit.flush">
-              <label for="flush" class="text-left">เมื่อกดรับเควส ระบบจะหักไอเทมที่ต้องการ</label>              
+              <label for="flush" class="text-left">เมื่อกดรับเควส ระบบจะหักไอเทมที่ต้องการ</label>
             </div>
             <div class="text-left form-group col-12">
               <input id="redo" type="checkbox" v-model="edit.redo">
-              <label for="redo" class="text-left">สามารถทำเควสนี้ซ้ำได้</label>              
+              <label for="redo" class="text-left">สามารถทำเควสนี้ซ้ำได้</label>
             </div>
             <div class="form-group col-6">
               <label for="quest">หมวดเควส</label>
@@ -183,7 +183,7 @@
             <div class="form-group col-6">
               <label for="place">สถานที่</label>
               <input class="center-form form-control" id="place" type="text" v-model="add.place">
-            </div>           
+            </div>
             <div class="form-group col-12">
               <label for="requiredItem">ไอเทมที่ต้องการ</label>
               <multiselect
@@ -206,7 +206,7 @@
                   <input class="form-control" type="text" name="count" v-model="requiredItem.count">
                 </div>
               </div>
-            </div>                    
+            </div>
             <div class="form-group col-12">
               <label for="prize">ของรางวัล</label>
               <multiselect
@@ -237,14 +237,14 @@
             <div class="form-group col-6">
               <label for="payEnergy">ให้ Energy</label>
               <input @keypress="validateEnergy" class="center-form form-control" id="payEnergy" type="text" v-model="add.payEnergy">
-            </div>                       
+            </div>
             <div class="text-left form-group col-12 mt-2">
               <input id="flush" type="checkbox" v-model="add.flush">
-              <label for="flush" class="text-left">เมื่อกดรับเควส ระบบจะหักไอเทมที่ต้องการ</label>              
+              <label for="flush" class="text-left">เมื่อกดรับเควส ระบบจะหักไอเทมที่ต้องการ</label>
             </div>
             <div class="text-left form-group col-12">
               <input id="redo" type="checkbox" v-model="add.redo">
-              <label for="redo" class="text-left">สามารถทำเควสนี้ซ้ำได้</label>              
+              <label for="redo" class="text-left">สามารถทำเควสนี้ซ้ำได้</label>
             </div>
             <div class="form-group col-6">
               <label for="quest">หมวดเควส</label>

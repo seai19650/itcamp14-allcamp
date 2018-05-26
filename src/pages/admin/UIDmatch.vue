@@ -8,7 +8,7 @@
         <div class="col">
           <div class="row justify-content-end">
             <div class="col-auto">
-              <button v-if="isRandomed" @click="saveRoles" class="btn btn btn-success">Save Setting</button>              
+              <button v-if="isRandomed" @click="saveRoles" class="btn btn btn-success">Save Setting</button>
             </div>
             <div class="col-auto">
               <button @click="randomAssign" class="btn btn-info">Random Setting</button>
@@ -67,7 +67,7 @@
               <td>{{ user.house }}</td>
               <td>{{ user.camp }}</td>
               <td>
-                <button @click="deleteUIDData(key)" class="btn btn-danger">ลบ</button>                
+                <button @click="deleteUIDData(key)" class="btn btn-danger">ลบ</button>
               </td>
             </tr>
           </tbody>
@@ -245,7 +245,7 @@ export default {
         firestore().collection('uid-matching').doc(key).update(payload)
         firestore().collection('users').doc(key).get().then(user => {
           if (user.exists) {
-            firestore().collection('users').doc(key).update(payload)            
+            firestore().collection('users').doc(key).update(payload)
           }
         })
       })

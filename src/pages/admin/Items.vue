@@ -17,7 +17,6 @@
               <th></th>
               <th>Name</th>
               <th>Description</th>
-              <th>Available</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -26,10 +25,7 @@
               <td><img class="img-item" :src="item.img" alt=""></td>
               <td>{{item.name}}</td>
               <td>{{item.description}}</td>
-              <td v-if="!editing.active">{{item.available}}</td>
-              <td v-else><input type="text" v-model="editing.available"></td>
               <td>
-                <button class="btn btn-warning" @click="prepareEditItem(item, key)">Edit</button>
                 <button class="btn btn-danger text-white" @click="prepareDeleteItem(item, key)">Delete</button>
               </td>
             </tr>
@@ -37,32 +33,6 @@
         </table>
       </div>
     </div>
-    <!-- editing -->
-    <div v-if="editing.active" class="overlay">
-      <div class="content">
-        <div class="container">
-          <div class="row">
-            <div class="col">
-              <h1>Modify Item</h1>
-              <h4>{{ editing.name }}</h4>
-              <div class="form-group">
-                <label for="available"></label>
-                <input @keypress="validateAvailable" class="center-form form-control" id="available" type="text" v-model="editing.available">
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button @click="editItem" style="background-color: rgb(31, 136, 17)" class="btn btn-spread">Save</button>
-            </div>
-            <div class="col">
-              <button @click="clearEditItem" style="background-color: rgb(59, 59, 59)" class="btn btn-spread">Cancel</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- end editing -->
 
     <!-- create new -->
     <div v-if="add.active" class="overlay">
@@ -79,10 +49,6 @@
             <div class="form-group col-12">
               <label for="description">Description</label>
               <textarea class="center-form form-control" id="description" type="text" v-model="add.description" cols="50"></textarea>
-            </div>
-            <div class="form-group col-12">
-              <label for="available">Available</label>
-              <input @keypress="validateAvailable" class="center-form form-control" id="available" type="text" v-model="add.available">
             </div>
             <div class="form-group col-12">
               <label for="img">Image Url</label>
@@ -131,12 +97,6 @@ export default {
         available: 0,
         img: ''
       },
-      editing: {
-        active: false,
-        id: null,
-        available: null,
-        name: null
-      },
       data: null
     }
   },
@@ -162,33 +122,15 @@ export default {
       this.add.active = false
       this.add.name = ''
       this.add.description = ''
-      this.add.available = 0
       this.add.img = ''
     },
     addItem () {
       let payload = {}
       payload.name = this.add.name
       payload.description = this.add.description
-      payload.available = parseInt(this.add.available)
       payload.img = this.add.img
       firestore().collection('items').add(payload)
       this.clearAddItem()
-    },
-    prepareEditItem (item, key) {
-      this.editing.active = true
-      this.editing.id = key
-      this.editing.name = item.name
-      this.editing.available = item.available
-    },
-    clearEditItem () {
-      this.editing.active = false
-      this.editing.id = null
-      this.editing.name = null
-      this.editing.available = null
-    },
-    editItem () {
-      firestore().collection('items').doc(this.editing.id).update({available: parseInt(this.editing.available)})
-      this.clearEditItem()
     },
     prepareDeleteItem (item, key) {
       this.deleting.active = true
@@ -207,13 +149,6 @@ export default {
     deleteItem () {
       firestore().collection('items').doc(this.deleting.id).delete()
       this.clearDeleteItem()
-    },
-    validateAvailable (el) {
-      if (el.keyCode >= 48 && el.keyCode <= 57) {
-        return true
-      } else {
-        el.preventDefault()
-      }
     }
   }
 }

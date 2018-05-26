@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user !== null" class="row p-3">
+  <div v-if="user !== null && energy" class="row p-3">
       <div class="col-3" id="profile">
         <div class="wall">
           <img :src="user.photoURL" alt="">
@@ -9,7 +9,7 @@
       <div class="col-9" id="info">
         <p class="name mb-1">{{user.name}}</p>
         <health :health="user.health"/>
-        <h3 class="energy text-left">{{ user.energy }} <small>energy</small></h3>
+        <h3 ref="energy" class="energy text-left">{{ energy }} <small>energy</small></h3>
       </div>
   </div>
 </template>
@@ -18,8 +18,19 @@
 import Health from '@/components/Health'
 export default {
   name: 'User',
-  props: ['user'],
-  components: {Health}
+  props: ['user', 'energy'],
+  components: {Health},
+  watch: {
+    energy () {
+      if (this.$refs.energy !== undefined) {
+        if (this.user.energy.toString().length > 9) {
+          this.$refs.energy.style.fontSize = 30 - (this.user.energy.toString().length - 9) * 2.5 + 'px'
+        } else {
+          this.$refs.energy.style.fontSize = '30px'
+        }
+      }
+    }
+  }
 }
 </script>
 
@@ -65,7 +76,7 @@ export default {
   margin-top: 10px;
   border-left: 5px solid #000;
   padding-left: 10px;
-  font-size: 1.2vw;
+  font-size: 30px;
 }
 
 .role {

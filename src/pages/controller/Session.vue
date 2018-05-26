@@ -13,6 +13,11 @@
       </div>
     </div>
     <hr>
+    <div class="row" v-if="error">
+      <div class="col">
+        <h3 class="text-muted">{{ error }}</h3>
+      </div>
+    </div>
     <div v-if="selectedQuest">
       <div class="row">
         <div class="col">
@@ -45,7 +50,7 @@
       <div class="row">
         <player :player="key" :quest="questId" :status="session" :key="key" v-for="(session,key) in sessions[questId]"/>
       </div>
-      <div class="row" v-if="isEmptySession">
+      <div class="row" v-if="emptySession">
         <div class="col">
           ยังไม่มีผู้เข้าร่วม
         </div>
@@ -73,11 +78,13 @@ export default {
   },
   data () {
     return {
-      sessions: null,
+      sessions: {},
       items: null,
       quests: null,
       questId: '',
-      selectedQuest: undefined
+      selectedQuest: null,
+      error: null,
+      emptySession: true
     }
   },
   mounted () {
@@ -140,7 +147,14 @@ export default {
       })
     },
     displaySession () {
-      this.selectedQuest = this.quests[this.questId]
+      this.isEmptySession()
+      this.selectedQuest = null
+      if (this.quests[this.questId] !== undefined) {
+        this.selectedQuest = this.quests[this.questId]
+        this.error = null
+      } else {
+        this.error = 'Not found'
+      }
     },
     finishGame () {
       let winners = []
@@ -148,7 +162,10 @@ export default {
         if (this.sessions[this.questId][key]) {
           winners.push(key)
         }
+        /* Reverse to Normal Mode */
+        firestore().collection('users').doc(key).update({inProcess: null})
       })
+
       /* Send Prize */
       winners.forEach((winner) => {
         firestore().collection('users').doc(winner).get().then(user => {
@@ -167,11 +184,9 @@ export default {
         })
       })
       firestore().collection('sessions').doc(this.questId).set({})
-    }
-  },
-  computed: {
+    },
     isEmptySession () {
-      return Object.keys(this.sessions[this.questId]).length === 0 && this.sessions.constructor === Object
+      this.emptySession = Object.keys(this.sessions[this.questId]).length === 0
     }
   }
 }

@@ -18,7 +18,7 @@ export default {
   components: {Navigation},
   metaInfo: {
     titleTemplate: '%s | Console'
-  },
+  }
 }
 </script>
 
