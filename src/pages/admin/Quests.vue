@@ -22,8 +22,8 @@
           </thead>
           <tbody>
             <tr v-for="(quest, key) in quests" :key="key">
-              <td>
-                {{quest.name}}
+              <td class="text-left">
+                <span class="text-primary">{{key}}</span> | {{quest.name}}
               </td>
               <td>
                 {{quest.description}}
@@ -45,9 +45,9 @@
       <div class="content">
         <div class="container">
           <div class="row">
-              <div class="col-12">
-            <h1>Edit Quest</h1>
-            <h4>{{edit.name}}</h4>
+            <div class="col-12">
+              <h1>Edit Quest</h1>
+              <h4>{{edit.name}}</h4>
             </div>
             <div class="form-group col-12">
               <label for="name">ชื่อเควส</label>
@@ -64,13 +64,36 @@
             <div class="form-group col-6">
               <label for="place">สถานที่</label>
               <input class="center-form form-control" id="place" type="text" v-model="edit.place">
-            </div>
+            </div>           
+            <div class="form-group col-12">
+              <label for="requiredItem">ไอเทมที่ต้องการ</label>
+              <multiselect
+              :multiple="true"
+              :close-on-select="true"
+              placeholder="เลือกไอเทม"
+              label="name"
+              track-by="name"
+              v-model="edit.requiredItem"
+              :options="itemsOption">
+              </multiselect>
+              <div class="row my-2" v-for="requiredItem in edit.requiredItem" :key="requiredItem.id">
+                <div class="form-group col m-0">
+                  <input disabled class="form-control" type="text" name="name" :value="requiredItem.name">
+                </div>
+                <div class="col-1">
+                  <p class="m-0"> = </p>
+                </div>
+                <div class="form-group col m-0">
+                  <input class="form-control" type="text" name="count" v-model="requiredItem.count">
+                </div>
+              </div>
+            </div>                    
             <div class="form-group col-12">
               <label for="prize">ของรางวัล</label>
               <multiselect
               :multiple="true"
               :close-on-select="true"
-              placeholder="Pick some"
+              placeholder="เลือกไอเทมรางวัล"
               label="name"
               track-by="name"
               v-model="edit.prize"
@@ -95,30 +118,7 @@
             <div class="form-group col-6">
               <label for="payEnergy">ให้ Energy</label>
               <input @keypress="validateEnergy" class="center-form form-control" id="payEnergy" type="text" v-model="edit.payEnergy">
-            </div>
-            <div class="form-group col-12">
-              <label for="requiredItem">ไอเทมที่ต้องการ</label>
-              <multiselect
-              :multiple="true"
-              :close-on-select="true"
-              placeholder="Pick some"
-              label="name"
-              track-by="name"
-              v-model="edit.requiredItem"
-              :options="itemsOption">
-              </multiselect>
-              <div class="row my-2" v-for="requiredItem in edit.requiredItem" :key="requiredItem.id">
-                <div class="form-group col m-0">
-                  <input disabled class="form-control" type="text" name="name" :value="requiredItem.name">
-                </div>
-                <div class="col-1">
-                  <p class="m-0"> = </p>
-                </div>
-                <div class="form-group col m-0">
-                  <input class="form-control" type="text" name="count" v-model="requiredItem.count">
-                </div>
-              </div>
-            </div>
+            </div>                       
             <div class="text-left form-group col-12 mt-2">
               <input id="flush" type="checkbox" v-model="edit.flush">
               <label for="flush" class="text-left">เมื่อกดรับเควส ระบบจะหักไอเทมที่ต้องการ</label>              
@@ -164,8 +164,9 @@
       <div class="content">
         <div class="container">
           <div class="row">
-              <div class="col-12">
-            <h1>Add Quest</h1>
+            <div class="col-12">
+              <h1>Add Quest</h1>
+              <h4>{{add.name}}</h4>
             </div>
             <div class="form-group col-12">
               <label for="name">ชื่อเควส</label>
@@ -175,20 +176,43 @@
               <label for="description">คำอธิบาย</label>
               <textarea class="center-form form-control" id="description" type="text" v-model="add.description" cols="50"></textarea>
             </div>
-            <div class="form-group col-12">
+            <div class="form-group col-6">
               <label for="npc">NPC</label>
               <input class="center-form form-control" id="npc" type="text" v-model="add.npc">
             </div>
-            <div class="form-group col-12">
+            <div class="form-group col-6">
               <label for="place">สถานที่</label>
               <input class="center-form form-control" id="place" type="text" v-model="add.place">
-            </div>
+            </div>           
             <div class="form-group col-12">
-              <label>ของรางวัล</label>
+              <label for="requiredItem">ไอเทมที่ต้องการ</label>
               <multiselect
               :multiple="true"
               :close-on-select="true"
-              placeholder="Pick some"
+              placeholder="เลือกไอเทม"
+              label="name"
+              track-by="name"
+              v-model="add.requiredItem"
+              :options="itemsOption">
+              </multiselect>
+              <div class="row my-2" v-for="requiredItem in add.requiredItem" :key="requiredItem.id">
+                <div class="form-group col m-0">
+                  <input disabled class="form-control" type="text" name="name" :value="requiredItem.name">
+                </div>
+                <div class="col-1">
+                  <p class="m-0"> = </p>
+                </div>
+                <div class="form-group col m-0">
+                  <input class="form-control" type="text" name="count" v-model="requiredItem.count">
+                </div>
+              </div>
+            </div>                    
+            <div class="form-group col-12">
+              <label for="prize">ของรางวัล</label>
+              <multiselect
+              :multiple="true"
+              :close-on-select="true"
+              placeholder="เลือกไอเทมรางวัล"
               label="name"
               track-by="name"
               v-model="add.prize"
@@ -213,37 +237,14 @@
             <div class="form-group col-6">
               <label for="payEnergy">ให้ Energy</label>
               <input @keypress="validateEnergy" class="center-form form-control" id="payEnergy" type="text" v-model="add.payEnergy">
+            </div>                       
+            <div class="text-left form-group col-12 mt-2">
+              <input id="flush" type="checkbox" v-model="add.flush">
+              <label for="flush" class="text-left">เมื่อกดรับเควส ระบบจะหักไอเทมที่ต้องการ</label>              
             </div>
-            <div class="form-group col-12">
-              <label for="requiredItem">ไอเทมที่ต้องการ</label>
-              <multiselect
-              :multiple="true"
-              :close-on-select="true"
-              placeholder="Pick some"
-              label="name"
-              track-by="name"
-              v-model="add.requiredItem"
-              :options="itemsOption">
-              </multiselect>
-              <div class="row my-2" v-for="requiredItem in add.requiredItem" :key="requiredItem.id">
-                <div class="form-group col m-0">
-                  <input disabled class="form-control" type="text" name="name" :value="requiredItem.name">
-                </div>
-                <div class="col-1">
-                  <p class="m-0"> = </p>
-                </div>
-                <div class="form-group col m-0">
-                  <input class="form-control" type="text" name="count" v-model="requiredItem.count">
-                </div>
-              </div>
-            </div>
-            <div class="form-group col-6">
-              <label for="flush">เมื่อกดรับเควส ระบบจะหักไอเทมที่ต้องการ</label>
-              <input class="center-form form-control" id="flush" type="checkbox" v-model="add.flush">
-            </div>
-            <div class="form-group col-6">
-              <label for="redo">สามารถทำเควสนี้ซ้ำได้</label>
-              <input class="center-form form-control" id="redo" type="checkbox" v-model="add.redo">
+            <div class="text-left form-group col-12">
+              <input id="redo" type="checkbox" v-model="add.redo">
+              <label for="redo" class="text-left">สามารถทำเควสนี้ซ้ำได้</label>              
             </div>
             <div class="form-group col-6">
               <label for="quest">หมวดเควส</label>
@@ -288,6 +289,9 @@ import Alert from '@/components/admin/Alert'
 export default {
   name: 'Quests',
   components: {Alert, Multiselect},
+  metaInfo: {
+    title: 'Quests'
+  },
   data () {
     return {
       roles: ['สายลับ', 'นักสะกดจิต', 'นักบิน', 'มือปืน'],
@@ -375,7 +379,6 @@ export default {
       firestore().collection('items').onSnapshot(snapshot => {
         let tmp = {}
         snapshot.forEach(doc => {
-          console.log(doc.id, '=>', doc.data())
           tmp[doc.id] = doc.data()
         })
         this.items = tmp
@@ -385,6 +388,19 @@ export default {
     },
     prepareAddQuest () {
       this.add.active = true
+      this.add.name = ''
+      this.add.description = ''
+      this.add.npc = ''
+      this.add.place = ''
+      this.add.prize = []
+      this.add.requiredEnergy = 0
+      this.add.payEnergy = 0
+      this.add.requiredItem = []
+      this.add.flush = false
+      this.add.redo = false
+      this.add.quest = ''
+      this.add.role = ''
+      this.add.max = 0
     },
     clearAddQuest () {
       this.add.active = false
@@ -418,6 +434,7 @@ export default {
       payload.role = this.add.role
       payload.max = parseInt(this.add.max)
       firestore().collection('quests').doc(this.nextId).set(payload)
+      firestore().collection('sessions').doc(this.nextId).set({})
       this.clearAddQuest()
     },
     prepareEditQuest (item, key) {
@@ -528,9 +545,14 @@ export default {
     itemsOption () {
       let data = []
       for (const key of Object.keys(this.items)) {
-        let tmp = Object.assign({}, this.items[key])
-        tmp.id = key
-        data.push(tmp)
+        let payload = {
+          available: this.items[key].available,
+          description: this.items[key].description,
+          id: key,
+          img: this.items[key].img,
+          name: this.items[key].name
+        }
+        data.push(payload)
       }
       return data
     }
@@ -538,8 +560,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 td {
-  vertical-align: middle
+  vertical-align: middle;
+}
+.black {
+  background-color: #000000;
 }
 </style>

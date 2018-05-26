@@ -3,24 +3,28 @@
     <div class="col-2 img">
       <img class="img-item" :src="item.img" alt="">
     </div>
-    <div class="col-7 name">{{item.name}}</div>
+    <div class="col-6 name text-left">{{item.name}}</div>
     <div class="col-2 count">{{count}}</div>
-    <div class="col-1 trade" @click="active = true">&#9974;</div>
+    <div class="col-2 trade" @click="active = true">&#9974;</div>
     <div v-if="active" class="overlay">
       <div class="content">
         <div class="container">
           <div class="row">
             <div class="col">
-              <h1>{{item.name}} : {{count}}</h1>
+              <h3>{{item.name}}</h3>
             </div>
           </div>
+          <hr>
           <div class="row">
             <div class="col">
               <div class="row">
                 <div class="col">
-                  <img class="img-info my-2" :src="item.img" alt="">
+                  <div class="wall">
+                    <img class="img-info" :src="item.img" alt="">                    
+                  </div>
                 </div>
               </div>
+              <hr>
               <div class="row">
                 <div class="col py-3 desc">
                   <p>{{item.description}}</p>
@@ -28,6 +32,7 @@
               </div>
             </div>
           </div>
+          <hr>
           <div class="row">
             <div class="col">
               <button style="background-color: rgb(59, 59, 59)" class="btn btn-spread" @click="abort">Close</button>
@@ -60,6 +65,7 @@ export default {
 .item {
   overflow: hidden;
   margin: 1em 0;
+  border-radius: 0.25em;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   .img-item {
     width: 100%;
@@ -105,7 +111,7 @@ export default {
   align-items: center;
   .content {
     width: 90vw;
-    max-width: 600px;
+    max-width: 400px;
     background: #fff;
     border-radius: 0.25em;
     position: relative;
@@ -132,5 +138,11 @@ export default {
       text-align: center;
     }
   }
+}
+.wall {
+  max-width: 250px;
+  overflow: hidden;
+  border-radius: 10px;
+  margin: 0 auto;
 }
 </style>

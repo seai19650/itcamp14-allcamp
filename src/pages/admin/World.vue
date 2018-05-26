@@ -12,6 +12,9 @@
 
 <script>
 export default {
-  name: 'WorldControl'
+  name: 'WorldControl',
+  metaInfo: {
+    title: 'World'
+  }
 }
 </script>

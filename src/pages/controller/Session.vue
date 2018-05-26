@@ -45,6 +45,12 @@
       <div class="row">
         <player :player="key" :quest="questId" :status="session" :key="key" v-for="(session,key) in sessions[questId]"/>
       </div>
+      <div class="row" v-if="isEmptySession">
+        <div class="col">
+          ยังไม่มีผู้เข้าร่วม
+        </div>
+      </div>
+      <hr>
       <div class="row mt-3">
         <div class="col">
           <button @click="finishGame" class="btn btn-info">
@@ -62,6 +68,9 @@ import { firestore } from 'firebase'
 export default {
   name: 'Session',
   components: {Player},
+  metaInfo: {
+    title: 'Session'
+  },
   data () {
     return {
       sessions: null,
@@ -93,11 +102,9 @@ export default {
       firestore().collection('quests').onSnapshot(snapshot => {
         let tmp = {}
         snapshot.forEach(doc => {
-          console.log(doc.id, '=>', doc.data())
           tmp[doc.id] = doc.data()
           if (parseInt(doc.id) >= parseInt(this.nextId)) {
             this.nextId = this.getNextId(parseInt(doc.id))
-            console.log(doc.id + ' : ' + this.nextId)
           }
           let prizeData = []
           Object.keys(tmp[doc.id].prize).forEach(key => {
@@ -125,7 +132,6 @@ export default {
       firestore().collection('items').onSnapshot(snapshot => {
         let tmp = {}
         snapshot.forEach(doc => {
-          console.log(doc.id, '=>', doc.data())
           tmp[doc.id] = doc.data()
         })
         this.items = tmp
@@ -161,6 +167,11 @@ export default {
         })
       })
       firestore().collection('sessions').doc(this.questId).set({})
+    }
+  },
+  computed: {
+    isEmptySession () {
+      return Object.keys(this.sessions[this.questId]).length === 0 && this.sessions.constructor === Object
     }
   }
 }

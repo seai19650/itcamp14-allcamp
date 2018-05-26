@@ -112,6 +112,9 @@ import Alert from '@/components/admin/Alert'
 export default {
   name: 'Items',
   components: {Alert},
+  metaInfo: {
+    title: 'Items'
+  },
   data () {
     return {
       deleting: {
@@ -145,7 +148,6 @@ export default {
       firestore().collection('items').onSnapshot(snapshot => {
         let tmp = {}
         snapshot.forEach(doc => {
-          console.log(doc.id, '=>', doc.data())
           tmp[doc.id] = doc.data()
         })
         this.data = tmp

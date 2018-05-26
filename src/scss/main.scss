@@ -74,3 +74,7 @@ $main-green: rgb(31, 136, 17);
   justify-content: center;
   flex-direction: column;
 }
+
+table {
+  table-layout: fixed;
+}

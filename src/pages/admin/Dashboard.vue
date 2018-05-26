@@ -15,7 +15,10 @@
 import Navigation from '@/components/admin/Navigation'
 export default {
   name: 'Dashboard',
-  components: {Navigation}
+  components: {Navigation},
+  metaInfo: {
+    titleTemplate: '%s | Console'
+  },
 }
 </script>
 

@@ -6,7 +6,9 @@
     v-for="(quest, key) in quests"
     :key="key" :id="key"
     :quest="quest"
-    :hasItem="hasItem"/>
+    :hasItem="hasItem"
+    :energy="quest.requiredEnergy"
+    :uid="uid"/>
   </div>
 </template>
 
@@ -15,13 +17,12 @@ import { firestore } from 'firebase'
 import Quest from '@/components/Quest'
 export default {
   name: 'Quests',
-  props: ['doneQuest', 'hasItem'],
+  props: ['doneQuest', 'hasItem', 'uid', 'userRole'],
   components: {Quest},
   data () {
     return {
       quests: null,
-      items: null,
-      userRole: JSON.parse(window.localStorage.getItem('user')).role
+      items: null
     }
   },
   mounted () {

@@ -1,16 +1,20 @@
 <template>
-  <div v-if="userDetail != null" style="min-height: 100vh" class="container-fluid flex-center">
-    <div class="container my-5 profile">
+  <div id="profile-card" v-if="userDetail != null" style="min-height: 100vh" class="container-fluid flex-center">
+    <div class="container my-3 my-md-5 profile">
       <user :user="userDetail"/>
       <hr>
       <items :userItem="userDetail.item" :state="noItem"/>
       <hr>
-      <quests :doneQuest="userDetail.doneQuest" :hasItem="userDetail.item"/>
+      <quests
+      :doneQuest="userDetail.doneQuest"
+      :hasItem="userDetail.item"
+      :uid="userDetail.uid"
+      :userRole="userDetail.role"/>
       <hr>
       <div class="row">
         <div class="col">
           <small>Player ID</small>
-          <h3>{{ user.numId }}</h3>
+          <h3>{{ userDetail.numId }}</h3>
         </div>
       </div>
       <hr>
@@ -30,21 +34,24 @@ import User from '@/components/User'
 import Items from '@/components/Items'
 import Quests from '@/components/Quests'
 import { auth, firestore } from 'firebase'
-import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'Profile',
   components: {User, Items, Quests},
+  props: ['id'],
   metaInfo: {
     title: 'Profile'
   },
   data () {
     return {
-      user: null,
+      uid: JSON.parse(window.localStorage.getItem('itcamp-wallet')).uid,
       userDetail: null
     }
   },
   mounted () {
-    this.user = this.getUser
+    if (this.id !== undefined) {
+      this.uid = this.id
+    }
+    console.log('Profile for ' + this.uid)    
     this.getUserData()
   },
   methods: {
@@ -59,24 +66,17 @@ export default {
     getUserData () {
       let self = this
       firestore().collection('users')
-        .where('uid', '==', this.user.uid.toString()).onSnapshot(snapshot => {
+        .where('uid', '==', this.uid.toString()).onSnapshot(snapshot => {
           snapshot.forEach((user) => {
             self.userDetail = user.data()
-            self.setUser(user.data())
           })
         })
-    },
-    ...mapActions([
-      'setUser'
-    ])
+    }
   },
   computed: {
     noItem () {
       return Object.keys(this.userDetail.item).length === 0 && this.userDetail.item.constructor === Object
-    },
-    ...mapGetters([
-      'getUser'
-    ])
+    }
   }
 }
 </script>
@@ -88,5 +88,14 @@ export default {
   display: block;
   position: relative;
   border-radius: 1.25em;
+}
+@media screen and (max-width: 320px) {
+  #profile-card {
+    padding: 0;
+    margin: 0;
+  }
+  .profile {
+    margin: 0;
+  }
 }
 </style>

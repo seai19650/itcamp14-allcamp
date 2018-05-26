@@ -44,6 +44,9 @@
 import { firestore } from 'firebase'
 export default {
   name: 'Users',
+  metaInfo: {
+    title: 'Users'
+  },
   data () {
     return {
       users: null

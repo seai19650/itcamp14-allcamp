@@ -47,6 +47,9 @@ import { firestore } from 'firebase'
 export default {
   name: 'UserEditor',
   props: ['user'],
+  metaInfo: {
+    title: 'U-Editor'
+  },
   data () {
     return {
       account: null
@@ -63,6 +66,7 @@ export default {
         })
     },
     saveData () {
+      this.account.energy = parseInt(this.account.energy)
       firestore().collection('users').doc(this.account.uid).set(this.account)
       this.$router.replace('/dashboard/users')
     }

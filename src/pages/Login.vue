@@ -49,41 +49,36 @@ export default {
         let data
 
         firestore().collection('uid-matching').doc(user.providerData[0].uid).get().then(uid => {
-          let self2 = inner
           self1.user = uid.data()
+          let self2 = inner          
           firestore().collection('users').doc(user.providerData[0].uid).get().then(account => {
             if (!account.exists) {
-              let firedata = self2
               console.log('Creating a new user.')
-              firestore().collection('env').doc('counter').get().then(order => {
-                self2.accId = order.data().positionId
-                firestore().collection('env').doc('counter').update({positionId: firein.accId + 1})
+              if (self2.user === undefined) {
+                console.log('No matching UID.')              
+                self2.$router.replace('contact/' + user.providerData[0].uid)
+              } else {
                 data = {
                   name: user.providerData[0].displayName,
                   uid: user.providerData[0].uid,
                   photoURL: user.providerData[0].photoURL,
                   firebaseUID: user.uid,
                   energy: 0,
-                  role: (firedata.user === undefined) ? null : firedata.user.role,
-                  house: (firedata.user === undefined) ? null : firedata.user.house,
+                  role: (self2.user === undefined) ? null : self2.user.role,
+                  house: (self2.user === undefined) ? null : self2.user.house,
                   health: 3,
                   doneQuest: [],
                   item: {},
-                  numId: firedata.getFormatAccId(firedata.accId),
-                  mode: (firedata.user === undefined) ? null : (firedata.user.player) ? 'player' : 'controller'
+                  numId: self2.user.numId,
+                  mode: (self2.user === undefined) ? null : (self2.user.player) ? 'player' : 'controller'
                 }
-                if (firedata.user === undefined) {
-                  console.log('No matching UID.')              
-                  firedata.$router.replace('contact/' + data.uid)
-                } else {
-                  console.log('Found matched UID.')
-                  let stroage = Object.assign({}, data)
-                  stroage.token = result.credential.accessToken
-                  window.localStorage.setItem('itcamp-wallet', JSON.stringify(stroage))
-                  firestore().collection('users').doc(data.uid).set(data)
-                  firedata.$router.replace('profile')
-                }
-              })
+                console.log('Found matched UID.')
+                let stroage = Object.assign({}, data)
+                stroage.token = result.credential.accessToken
+                window.localStorage.setItem('itcamp-wallet', JSON.stringify(stroage))
+                firestore().collection('users').doc(data.uid).set(data)
+                self2.$router.replace('profile')
+              }
             } else {
               console.log('Account is already in Database.')
               data = account.data()
@@ -105,19 +100,6 @@ export default {
       this.loggingIn = true
       window.localStorage.setItem('loggingIn', true)
       auth().signInWithRedirect(provider)
-    },
-    getFormatAccId (id) {
-      let nextId = id.toString()
-      let strLength = nextId.length
-      if (strLength === 3) {
-        return nextId
-      } else {
-        if (strLength === 2) {
-          return '0' + nextId
-        } else {
-          return '00' + nextId
-        }
-      }
     }
   }
 }

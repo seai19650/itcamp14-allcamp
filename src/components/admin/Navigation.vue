@@ -3,42 +3,42 @@
     <div class="row pt-5">
       <hr>
       <div class="col">
-        <router-link tag="div" active-class="active" class="btn-side-navigation" :to="{name: 'ManageQuests'}">Quests</router-link>
+        <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageQuests'}">Quests</router-link>
       </div>
       <hr>
     </div>
     <div class="row">
       <hr>
       <div class="col">
-        <router-link tag="div" active-class="active" class="btn-side-navigation" :to="{name: 'ManageItems'}">Items</router-link>
+        <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageItems'}">Items</router-link>
       </div>
       <hr>
     </div>
     <div class="row" v-if="user.mode === 'admin'">
       <hr>
       <div class="col">
-        <router-link tag="div" active-class="active" class="btn-side-navigation" :to="{name: 'ManageUsers'}">Users</router-link>
+        <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageUsers'}">Users</router-link>
       </div>
       <hr>
     </div>
     <div class="row" v-if="user.mode === 'admin'">
       <hr>
       <div class="col">
-        <router-link tag="div" active-class="active" class="btn-side-navigation" :to="{name: 'ManageWorld'}">World Control</router-link>
+        <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageWorld'}">World Control</router-link>
       </div>
       <hr>
     </div>
     <div class="row">
       <hr>
       <div class="col">
-        <router-link tag="div" active-class="active" class="btn-side-navigation" :to="{name: 'ManageSession'}">Session</router-link>
+        <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageSession'}">Session</router-link>
       </div>
       <hr>
     </div>
     <div class="row">
       <hr>
       <div class="col">
-        <router-link tag="div" active-class="active" class="btn-side-navigation" :to="{name: 'ManageAssigner'}">Assigner</router-link>
+        <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageAssigner'}">Assigner</router-link>
       </div>
       <hr>
     </div>
@@ -46,13 +46,13 @@
     <div class="row">
       <hr>
       <div class="col">
-        <router-link tag="div" active-class="active" class="btn-side-navigation" :to="{name: 'ManageUID'}">UID</router-link>
+        <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageUID'}">UID</router-link>
       </div>
       <hr>
     </div>
     <div class="row">
       <div class="col">
-        <div class="btn-side-navigation text-white go-red" @click="logOut">Logout</div>
+        <div class="btn-side-navigation text-right text-white go-red" @click="logOut">Logout</div>
       </div>
     </div>
   </div>
