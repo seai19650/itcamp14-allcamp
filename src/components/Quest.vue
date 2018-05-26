@@ -95,11 +95,10 @@ export default {
       if (this.quest.flush) {
         this.quest.requiredItem.forEach((ritem) => {
           this.hasItem[ritem.id] -= ritem.count
-          let item = {}
-          item[ritem.id] = this.hasItem[ritem.id]
-          firestore().collection('users').doc(this.user.uid).update({item})
         })
       }
+      firestore().collection('users').doc(this.user.uid).update({item: this.hasItem})
+
       firestore().collection('users').doc(this.user.uid).update({
         energy: this.user.energy - this.quest.requiredEnergy,
         doneQuest: this.user.doneQuest

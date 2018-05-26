@@ -44,7 +44,8 @@ export default {
   data () {
     return {
       uid: JSON.parse(window.localStorage.getItem('itcamp-wallet')).uid,
-      userDetail: null
+      userDetail: null,
+      sessions: null
     }
   },
   mounted () {
@@ -71,6 +72,15 @@ export default {
             self.userDetail = user.data()
           })
         })
+    },
+    getSessions () {
+      let tmp = {}
+      firestore().collection('sessions').onSnapshot(sessions => {
+        sessions.forEach((session) => {
+          tmp[session.id] = session.data()
+        })
+        this.sessions = tmp
+      })
     }
   },
   computed: {
