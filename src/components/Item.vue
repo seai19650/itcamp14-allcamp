@@ -5,7 +5,7 @@
     </div>
     <div class="col-6 name text-left">{{item.name}}</div>
     <div class="col-2 count">{{count}}</div>
-    <div class="col-2 trade" @click="active = true">&#9974;</div>
+    <div class="col-2 trade" @click="active = true"><i class="fas fa-angle-right"></i></div>
     <div v-if="active" class="overlay">
       <div class="content">
         <div class="container">
@@ -99,23 +99,9 @@ export default {
 }
 
 .overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  min-height: 100vh;
-  background: rgba(0,0,0,0.8);
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   .content {
     width: 90vw;
     max-width: 400px;
-    background: #fff;
-    border-radius: 0.25em;
-    position: relative;
-    display: block;
   }
   .img-info {
     max-width: 250px;

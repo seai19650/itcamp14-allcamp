@@ -17,6 +17,7 @@
 
 <script>
 import { auth, firestore } from 'firebase'
+import { mapActions } from 'vuex'
 export default {
   name: 'Login',
   data () {
@@ -64,7 +65,7 @@ export default {
                   doneQuest: [],
                   item: {},
                   inProcess: {
-                    controlable: true,
+                    controllable: true,
                     header: 'สวัสดีนะ!',
                     msg: 'ยินดีต้อนรับเข้าสู่ IT CAMP 14 ครับ!'
                   },
@@ -74,8 +75,8 @@ export default {
                 console.log('Found matched UID.')
                 let stroage = Object.assign({}, data)
                 stroage.token = result.credential.accessToken
-                window.localStorage.setItem('itcamp-wallet', JSON.stringify(stroage))
                 firestore().collection('users').doc(data.uid).set(data)
+                self2.setUser(stroage)
                 self2.$router.replace('profile')
               }
             } else {
@@ -83,7 +84,7 @@ export default {
               data = account.data()
               let stroage = Object.assign({}, data)
               stroage.token = result.credential.accessToken
-              window.localStorage.setItem('itcamp-wallet', JSON.stringify(stroage))
+              self.setUser(stroage)
               self.$router.replace('profile')
             }
           })
@@ -94,6 +95,9 @@ export default {
     })
   },
   methods: {
+    ...mapActions([
+      'setUser'
+    ]),
     login () {
       let provider = new auth.FacebookAuthProvider()
       this.loggingIn = true

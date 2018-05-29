@@ -3,6 +3,7 @@ import Profile from '@/pages/Profile'
 import Login from '@/pages/Login'
 import Privacy from '@/pages/Privacy'
 import Contact from '@/pages/Contact'
+import Live from '@/pages/Live'
 
 import Dashboard from '@/pages/admin/Dashboard'
 import Items from '@/pages/admin/Items'
@@ -13,6 +14,7 @@ import UserEditor from '@/pages/admin/UserEditor'
 import UIDmatch from '@/pages/admin/UIDmatch'
 import Session from '@/pages/controller/Session'
 import Assigner from '@/pages/controller/Assigner'
+import store from '@/store'
 
 const router = new Router({
   mode: 'history',
@@ -36,6 +38,17 @@ const router = new Router({
       path: '/privacy',
       name: 'Privacy',
       component: Privacy
+    },
+    {
+      path: '/live',
+      name: 'Live',
+      component: Live,
+      meta: {
+        requiresAuth: true,
+        playerAuth: false,
+        controllerAuth: true,
+        adminAuth: true
+      }
     },
     {
       path: '/contact/:uid',
@@ -159,11 +172,11 @@ router.beforeEach((to, from, next) => {
   } else {
     if (to.meta.requiresAuth) {
       console.log('Authenticated Routing..')
-      const user = JSON.parse(window.localStorage.getItem('itcamp-wallet'))
+      const user = store.getters.getUser
       if (!user || !user.token) {
         next({name: 'Login'})
       } else if (to.meta.adminAuth && !to.meta.controllerAuth) {
-        const user = JSON.parse(window.localStorage.getItem('itcamp-wallet'))
+        const user = store.getters.getUser
         if (user.mode === 'admin') {
           next()
         } else if (user.mode === 'controller') {
@@ -172,14 +185,14 @@ router.beforeEach((to, from, next) => {
           next({name: 'Profile'})
         }
       } else if (to.meta.adminAuth && to.meta.controllerAuth) {
-        const user = JSON.parse(window.localStorage.getItem('itcamp-wallet'))
+        const user = store.getters.getUser
         if (user.mode === 'admin' || user.mode === 'controller') {
           next()
         } else {
           next({name: 'Profile'})
         }
       } else if (to.meta.playerAuth) {
-        const user = JSON.parse(window.localStorage.getItem('itcamp-wallet'))
+        const user = store.getters.getUser
         if (user.mode === 'player') {
           next()
         } else {
@@ -187,9 +200,8 @@ router.beforeEach((to, from, next) => {
         }
       }
     } else {
-      console.log('Public Routing')
-      const user = JSON.parse(window.localStorage.getItem('itcamp-wallet'))
-      if (user && !to.name.includes(global)) {
+      const user = store.getters.getUser
+      if (user !== undefined && !global.includes(to.name)) {
         next({name: 'Profile'})
       } else {
         next()

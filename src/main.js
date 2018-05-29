@@ -10,6 +10,7 @@ import firebaseConfig from '@/config/firebase'
 import globalStyle from '@/scss/main.scss'
 import bootstrap from 'bootstrap/scss/bootstrap.scss'
 import multiselectCss from 'vue-multiselect/dist/vue-multiselect.min.css'
+import store from './store'
 
 Vue.use(VueRouter)
 Vue.use(Meta)
@@ -26,6 +27,7 @@ firebase.auth().onAuthStateChanged(function (user) {
       router,
       globalStyle,
       bootstrap,
+      store,
       multiselectCss,
       components: { App },
       template: '<App/>'

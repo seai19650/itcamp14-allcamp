@@ -12,6 +12,11 @@
         </div>
       </div>
       <hr>
+      <div v-if="error" class="row">
+        <div class="col">
+          <h3 class="text-muted">{{ error }}</h3>
+        </div>
+      </div>
       <div v-if="selectedPlayer" class="row mb-3">
         <div class="col-12 col-lg-6">
           <profile :id="selectedPlayer.uid" />
@@ -34,7 +39,7 @@
             <div class="col-6">
               <div class="form-group">
                 <label for="quantity">จำนวน</label>
-                <input @keypress="numberOnly" v-model="add.quantity" class="form-control" type="text" name="quantity" id="quantity"/>
+                <input @keypress="numberOnly" v-model="add.quantity" class="form-control" type="number" name="quantity" id="quantity"/>
               </div>
             </div>
             <div class="col-12">
@@ -62,7 +67,7 @@
             <div class="col-12">
               <div class="form-group">
                 <label for="step">Step</label>
-                <input @keypress="numberOnly" v-model="stepEnergy" class="form-control" name="step" id="step">
+                <input type="number" @keypress="numberOnly" v-model="stepEnergy" class="form-control" name="step" id="step">
               </div>
             </div>
             <div class="col-12">
@@ -119,7 +124,8 @@ export default {
         quantity: 0
       },
       stepEnergy: 0,
-      doneQuest: []
+      doneQuest: [],
+      error: undefined
     }
   },
   mounted () {
@@ -132,11 +138,19 @@ export default {
       firestore().collection('users').doc(this.selectedPlayer.uid).update({doneQuest: this.doneQuest})
     },
     getDoneQuests () {
-      firestore().collection('users').doc(this.selectedPlayer.uid).onSnapshot(user => {
-        this.doneQuest = user.data().doneQuest
-      })
+      if (this.selectedPlayer !== null) {
+        firestore().collection('users').doc(this.selectedPlayer.uid).onSnapshot(user => {
+          this.doneQuest = user.data().doneQuest
+          this.error = undefined
+        })
+      } else {
+        this.error = 'Not Found'
+      }
     },
     handleItem (mode) {
+      if (this.add.id === null || this.add.quantity.length === 0 || parseInt(this.add.quantity) === 0) {
+        return
+      }
       let self = this
       firestore().collection('users').doc(this.selectedPlayer.uid).get().then(user => {
         let item = user.data().item
@@ -170,6 +184,9 @@ export default {
       })
     },
     handleEnergy (mode) {
+      if (this.stepEnergy.length === 0) {
+        this.stepEnergy = 0
+      }
       let self = this
       this.stepEnergy = parseInt(this.stepEnergy)
       if (mode) {
@@ -231,6 +248,7 @@ export default {
 
 .done-action {
   background-color: rgb(219, 219, 219);
+  border-radius: 0.25em;
 }
 
 .hand {

@@ -18,7 +18,7 @@
         <h3 class="text-muted">{{ error }}</h3>
       </div>
     </div>
-    <div v-if="selectedQuest">
+    <div v-if="selectedQuest && sessions[questId] !== undefined">
       <div class="row">
         <div class="col">
           <h2 class="text-left header">{{ selectedQuest.name }}</h2>
@@ -48,17 +48,22 @@
       </div>
       <hr>
       <div class="row">
-        <player :player="key" :quest="questId" :status="session" :key="key" v-for="(session,key) in sessions[questId]"/>
+        <player :questData="quests[questId]" v-if="sessions[questId][key] !== null && key !== 'playing'" :session="sessions[questId]" :player="key" :quest="questId" :status="session" :key="key" v-for="(session,key) in sessions[questId]"/>
       </div>
-      <div class="row" v-if="emptySession">
+      <div class="row" v-if="isEmptySession">
         <div class="col">
           ยังไม่มีผู้เข้าร่วม
         </div>
       </div>
       <hr>
       <div class="row mt-3">
-        <div class="col">
-          <button @click="finishGame" class="btn btn-info">
+        <div v-if="!sessions[questId].playing" class="col">
+          <button @click="startQuest" :class="['btn btn-primary', {'gray-out': this.countPlayer === 0}]">
+            เริ่มเควส
+          </button>
+        </div>
+        <div v-else class="col">
+          <button @click="finishQuest" class="btn btn-info">
             จบรอบ (บันทึกผลและเตรียมระบบสำหรับรอบต่อไป)
           </button>
         </div>
@@ -83,8 +88,7 @@ export default {
       quests: null,
       questId: '',
       selectedQuest: null,
-      error: null,
-      emptySession: true
+      error: null
     }
   },
   mounted () {
@@ -93,9 +97,6 @@ export default {
     this.getQuests()
   },
   methods: {
-    handleState (key) {
-      console.log(key)
-    },
     getSessions () {
       firestore().collection('sessions').onSnapshot(sessions => {
         let tmp = {}
@@ -147,23 +148,45 @@ export default {
       })
     },
     displaySession () {
-      this.isEmptySession()
-      this.selectedQuest = null
       if (this.quests[this.questId] !== undefined) {
         this.selectedQuest = this.quests[this.questId]
         this.error = null
       } else {
+        this.selectedQuest = null
         this.error = 'Not found'
       }
     },
-    finishGame () {
+    startQuest () {
+      if (this.countPlayer === 0) return
+      firestore().collection('sessions').doc(this.questId).update({playing: true})
+    },
+    finishQuest () {
+      let session = this.sessions[this.questId]
+      delete session.playing
       let winners = []
-      Object.keys(this.sessions[this.questId]).forEach((key) => {
-        if (this.sessions[this.questId][key]) {
+      Object.keys(session).forEach((key) => {
+        if (session[key]) {
           winners.push(key)
+          firestore().collection('users').doc(key).update(
+            {
+              inProcess: {
+                controllable: true,
+                header: 'ชนะ!',
+                msg: 'ไอเทมและรางวัลได้ถูกโอนเข้าบัญชีแล้ว'
+              }
+            }
+          )
+        } else if (session[key] !== null) {
+          firestore().collection('users').doc(key).update(
+            {
+              inProcess: {
+                controllable: true,
+                header: 'แพ้',
+                msg: 'สู้ๆนะครับ ^^'
+              }
+            }
+          )
         }
-        /* Reverse to Normal Mode */
-        firestore().collection('users').doc(key).update({inProcess: null})
       })
 
       /* Send Prize */
@@ -183,10 +206,32 @@ export default {
           firestore().collection('users').doc(winner).update(payload)
         })
       })
-      firestore().collection('sessions').doc(this.questId).set({})
-    },
+      firestore().collection('sessions').doc(this.questId).set({playing: false})
+    }
+  },
+  computed: {
     isEmptySession () {
-      this.emptySession = Object.keys(this.sessions[this.questId]).length === 0
+      if (this.sessions[this.questId] !== undefined) {
+        let count = 0
+        Object.keys(this.sessions[this.questId]).forEach((user) => {
+          if (this.sessions[this.questId][user] === null) {
+            count += 1
+          }
+        })
+        return Object.keys(this.sessions[this.questId]).length === 1 + count
+      }
+      return true
+    },
+    countPlayer () {
+      if (this.sessions[this.questId] !== undefined) {
+        let count = 0
+        Object.keys(this.sessions[this.questId]).forEach((user) => {
+          if (this.sessions[this.questId][user] === null) {
+            count += 1
+          }
+        })
+        return Object.keys(this.sessions[this.questId]).length - 1 - count
+      }
     }
   }
 }
@@ -206,5 +251,8 @@ export default {
 .header {
   border-left: 10px solid #000;
   padding-left: 10px;
+}
+.gray-out {
+  filter: grayscale(1)
 }
 </style>

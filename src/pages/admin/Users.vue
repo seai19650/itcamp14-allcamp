@@ -13,15 +13,24 @@
             <tr>
               <th>ID</th>
               <th>Name</th>
-              <th>Mode</th>
+              <th>House</th>
+              <th v-if="getUser.mode === 'admin'">Mode</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.id">
-              <td>{{ user.numId }}</td>
-              <td>{{ user.name }}</td>
               <td>
+                <p class="mb-0">{{ user.numId }}</p>
+                <small>{{ user.uid }}</small>
+              </td>
+              <td>
+                <p class="mb-0">{{ user.name }}</p>
+                <small class="text-primary">{{ user.mode }}</small>
+              </td>
+              <td v-if="user.house">{{ user.house }}</td>
+              <td v-else>-</td>
+              <td v-if="getUser.mode === 'admin'">
                 <div class="form-group mb-0">
                   <select @change="updateMode(user.uid)" v-model="user.mode" type="text" name="mode" class="form-control">
                     <option :selected="user.mode === 'player'" value="player">Player</option>
@@ -44,6 +53,7 @@
 
 <script>
 import { firestore } from 'firebase'
+import { mapGetters } from 'vuex';
 export default {
   name: 'Users',
   metaInfo: {
@@ -77,6 +87,11 @@ export default {
     deleteUser (id) {
       firestore().collection('users').doc(id).delete()
     }
+  },
+  computed: {
+    ...mapGetters([
+      'getUser'
+    ])
   }
 }
 </script>

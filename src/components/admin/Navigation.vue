@@ -1,5 +1,5 @@
 <template>
-  <div id="navigation-dash">
+  <div id="navigation-dash" v-if="user">
     <div class="row pt-5">
       <hr>
       <div class="col">
@@ -21,7 +21,7 @@
       </div>
       <hr>
     </div>
-    <div class="row" v-if="user.mode === 'admin'">
+    <div class="row">
       <hr>
       <div class="col">
         <router-link tag="div" active-class="active" class="btn-side-navigation text-right" :to="{name: 'ManageWorld'}">World Control</router-link>
@@ -60,21 +60,34 @@
 
 <script>
 import { auth } from 'firebase'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'Navigation',
   data () {
     return {
-      user: JSON.parse(localStorage.getItem('itcamp-wallet'))
+      user: null
     }
+  },
+  mounted () {
+    this.user = this.getUser
   },
   methods: {
     logOut () {
       auth().signOut().then(() => {
         window.localStorage.removeItem('itcamp-wallet')
         window.localStorage.setItem('justOut', true)
+        this.clearUser()
         this.$router.replace('/login')
       })
-    }
+    },
+    ...mapActions([
+      'clearUser'
+    ])
+  },
+  computed: {
+    ...mapGetters([
+      'getUser'
+    ])
   }
 }
 </script>

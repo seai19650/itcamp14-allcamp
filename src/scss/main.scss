@@ -40,7 +40,7 @@ $main-green: rgb(31, 136, 17);
     z-index: 10;
     display: flex;
     justify-content: center;
-    align-items: center;
+    padding-top: 10px;
     .content {
       width: 90vw;
       max-width: 600px;
@@ -50,8 +50,9 @@ $main-green: rgb(31, 136, 17);
       display: block;
       padding-top: 20px;
       padding-bottom: 20px;
-      max-height: 90vh;
+      max-height: 76vh;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .btn-group {
       margin-bottom: 3px;

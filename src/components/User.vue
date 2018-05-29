@@ -1,15 +1,16 @@
 <template>
-  <div v-if="user !== null && energy" class="row p-3">
-      <div class="col-3" id="profile">
-        <div class="wall">
+  <div v-if="user !== null && energy !== null" class="row p-3">
+      <div class="col-3 p-0 flex-center" id="profile">
+        <div class="wall mx-auto">
           <img :src="user.photoURL" alt="">
         </div>
-        <p class="role">{{user.role}}</p>
+        <p class="mb-0 role">{{user.role}}</p>
       </div>
-      <div class="col-9" id="info">
-        <p class="name mb-1">{{user.name}}</p>
+      <div class="col-9 p-0" id="info">
+        <p class="name mb-1">{{user.name}} : <span class="text-capitalize text-info">{{user.house}}</span></p>
         <health :health="user.health"/>
-        <h3 ref="energy" class="energy text-left">{{ energy }} <small>energy</small></h3>
+        <h3 v-if="!energyGone" ref="energy" class="energy text-left">{{ formatEnergy(energy) }} <small>energy</small></h3>
+        <h3 v-else ref="energy" class="energy text-left text-danger">0 <small>energy</small></h3>
       </div>
   </div>
 </template>
@@ -18,13 +19,18 @@
 import Health from '@/components/Health'
 export default {
   name: 'User',
-  props: ['user', 'energy'],
+  props: ['user', 'energy', 'energyGone'],
   components: {Health},
+  methods: {
+    formatEnergy(energy) {
+      return energy.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+  },
   watch: {
     energy () {
       if (this.$refs.energy !== undefined) {
         if (this.user.energy.toString().length > 9) {
-          this.$refs.energy.style.fontSize = 30 - (this.user.energy.toString().length - 9) * 2.5 + 'px'
+          this.$refs.energy.style.fontSize = 30 - Math.min(16 ,(this.user.energy.toString().length - 9) * 2.5) + 'px'
         } else {
           this.$refs.energy.style.fontSize = '30px'
         }
@@ -57,12 +63,7 @@ export default {
     text-align: center;
     width: 100%;
     padding: 0.2em;
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    margin: 0;
-    background-color: rgb(3, 54, 129);
-    color: #fff;
+    color: rgb(0, 0, 0);
   }
 }
 
@@ -77,6 +78,9 @@ export default {
   border-left: 5px solid #000;
   padding-left: 10px;
   font-size: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .role {

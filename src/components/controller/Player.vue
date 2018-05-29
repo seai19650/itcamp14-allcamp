@@ -1,12 +1,19 @@
 <template>
-  <div @click="handleState" v-if="isReady" :class="[{'win': status},'col-12 player m-1']">
+  <div v-if="user && session" :class="[{'win': status},'col-12 player m-1']">
     <div class="row">
       <div class="col">
-        <h6 class="text-left">{{ users[player].name }}</h6>
-        <p class="text-left mb-0">Energy : {{ users[player].energy }}</p>
+        <h6 class="text-left"><span class="text-info text-capitalize">{{ user.house }}</span> | {{ user.name }}</h6>
+        <p class="text-left mb-0">Energy : {{ user.energy }}</p>
       </div>
-      <div class="col-4">
-        <p class="m-0 house text-capitalize">{{ users[player].house }}</p>
+      <div class="col-6">
+        <div class="row justify-content-end">
+          <div v-if="isPlaying" class="col-auto">
+            <button @click="handleState" class="btn-spread btn-info btn">{{ btnMsg }}</button>
+          </div>
+          <div v-else class="col-auto">
+            <button @click="rejectUser" class="btn-spread btn-danger btn">Reject</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -16,16 +23,52 @@
 import { firestore } from 'firebase'
 export default {
   name: 'Player',
-  props: ['player', 'quest', 'status'],
+  props: ['player', 'quest', 'status', 'session', 'questData'],
   data () {
     return {
-      users: null
+      users: null,
+      user: null,
+      userState: null
     }
   },
   mounted () {
     this.getUsers()
+    this.userState = this.status
   },
   methods: {
+    rejectUser () {
+      let payload = {}
+      payload[this.player] = null
+      firestore().collection('sessions').doc(this.quest).update(payload)
+
+      if (!this.questData.redo) {
+        this.user.doneQuest.splice(this.user.doneQuest.indexOf(this.quest), 1)        
+      }
+
+      let message = {
+        controlable: true,
+        header: 'Aborted Quest',
+        msg: 'การเข้าร่วมเควสถูกปฏิเสธ'
+      }
+
+      firestore().collection('users').doc(this.player).update({inProcess: message})
+
+      if (this.questData.flush) {
+        let reverse = {}
+        reverse.energy = this.questData.requiredEnergy + this.user.energy
+        this.questData.requiredItem.forEach((item) => {
+          if (this.user.item[item.id] !== undefined) {
+            this.user.item[item.id] += item.count
+          } else {
+            this.user.item[item.id] = item.count
+          }
+        })
+        reverse.item = this.user.item
+        reverse.doneQuest = this.user.doneQuest
+        firestore().collection('users').doc(this.user.uid).update(reverse)
+      }
+
+    },
     getUsers () {
       firestore().collection('users').onSnapshot(snapshot => {
         let tmp = {}
@@ -33,12 +76,14 @@ export default {
           tmp[doc.id] = doc.data()
         })
         this.users = tmp
+        this.user = this.users[this.player]
       }, err => {
         console.log(`Encountered error: ${err}`)
       })
     },
     handleState () {
       let status = !this.status
+      this.userState = status
       let payload = {}
       if (status) {
         payload[this.player] = true
@@ -49,8 +94,14 @@ export default {
     }
   },
   computed: {
-    isReady () {
-      return this.users !== null
+    btnMsg () {
+      if (this.userState) {
+        return 'Unmark'
+      }
+      return 'Mark as Winner'
+    },
+    isPlaying () {
+      return this.session.playing
     }
   }
 }

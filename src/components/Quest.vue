@@ -1,7 +1,9 @@
 <template>
   <div v-if="energy" class="quest row">
-    <div class="pl-2 col-9 name text-left">{{ id }} | {{quest.name}}</div>
-    <div :class="['col-3 trade', {'done': isDone}, {'not-accept': !isAccept && !isDone}]" @click="active = true">&#9974;</div>
+    <div class="pl-2 col-9 name text-left">
+      <span class="text-info">{{ id }}</span> | {{quest.name}}
+    </div>
+    <div :class="['col-3 trade', {'done': isDone}, {'not-accept': (!isAccept && !isDone) || energyGone}]" @click="active = true"><i class="fas fa-angle-right"></i></div>
     <div v-if="active" class="overlay">
       <div class="content">
         <div class="container">
@@ -25,19 +27,16 @@
                 </div>
               </div>
               <hr>
-              <p>
-                ใช้ <b>{{quest.requiredEnergy}}</b> energy
-                <span v-if="quest.redo"> | สามารถทำซ้ำได้</span>
-                <span v-else> | ไม่สามารถทำซ้ำได้</span>
-                <span v-if="quest.flush"> | หักไอเทมและ energy</span>
-              </p>
+              <ul class="list-unstyled">
+                <li><b>ใช้ {{quest.requiredEnergy}}</b> energy</li>
+                <li v-if="quest.redo">สามารถทำซ้ำได้</li>
+                <li v-else>ไม่สามารถทำซ้ำได้</li>
+                <li v-if="quest.flush">หักไอเทมและ energy</li>                         
+              </ul>
               <hr>
               <h5 class="text-info">ไอเทมที่ต้องการ</h5>
               <p class="m-1 text-muted" v-if="quest.requiredItem.length === 0">ไม่มีไอเทมที่ต้องการ</p>
-              <p v-else
-              :class="['m-1']"
-              v-for="data in quest.requiredItem"
-              :key="data.id">{{data.name}} : {{data.count}}</p>
+              <p v-else :class="['m-1']" v-for="data in quest.requiredItem" :key="data.id">{{data.name}} : {{data.count}}</p>
               <hr>
               <h5 class="text-info">ของรางวัล</h5>
               <p class="m-1 text-muted" v-if="quest.prize.length === 0">ไม่มีของรางวัล</p>
@@ -48,13 +47,27 @@
               <hr>
             </div>
           </div>
-          <div class="row" v-if="!isAccept && !isDone">
-            <div class="col">
-              <p>ไม่สามารถรับเควสนี้ได้เนื่องจากไอเทม หรือ energy ไม่ตรงตามเงื่อนไข</p>
+          <div class="row">
+            <div v-if="!isFull" class="col">
+              <p>เควสนี้รับได้
+                <span class="font-weight-bold">{{ quest.max }}</span> คนต่อรอบ</p>
+              <p class="mb-0">ขณะนี้มีผู้เล่น
+                <span class="font-weight-bold">{{ playerCount }}</span> คน</p>
             </div>
           </div>
-          <div class="row" v-if="!isDone">
-            <div class="col" v-if="isAccept">
+          <hr v-show="!isFull">
+          <div class="row">
+            <div class="col">
+              <p class="mb-0" v-if="(!isAccept && !isDone) || energyGone">ไม่สามารถรับเควสนี้ได้เนื่องจากไอเทม หรือ energy ไม่ตรงตามเงื่อนไข</p>
+              <p class="mb-0" v-else-if="session.playing">เควสนี้ได้เริ่มไปแล้ว</p>
+              <p class="mb-0" v-else-if="isFull">เควสนี้มีผู้ร่วมเล่นในรอบนี้ครบแล้ว</p>
+              <p class="mb-0" v-else-if="isDone">เคยทำเควสนี้ไปแล้ว</p>
+              <p class="mb-0" v-else>กดรับเควสข้างล่างเพื่อดำเนินการ</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row" v-if="!isDone && !energyGone">
+            <div class="col" v-if="isAccept && !isFull && !session.playing">
               <button @click="inGame" style="background-color: rgb(3, 54, 129)" class="btn btn-spread">รับเควส</button>
             </div>
             <div class="col">
@@ -62,8 +75,7 @@
             </div>
           </div>
           <div class="row" v-else>
-            <div class="col">
-              <p>ได้เคยทำเควสนี้ไปแล้ว</p>
+            <div class=" col">
             </div>
             <div class="col">
               <button style="background-color: rgb(59, 59, 59)" class="btn btn-spread" @click="abort">ปิด</button>
@@ -75,11 +87,12 @@
   </div>
 </template>
 
+
 <script>
 import { firestore } from 'firebase'
 export default {
   name: 'Quest',
-  props: ['quest', 'hasItem', 'id', 'energy', 'uid'],
+  props: ['quest', 'hasItem', 'id', 'energy', 'uid', 'session', 'energyGone'],
   data () {
     return {
       active: false,
@@ -107,11 +120,11 @@ export default {
           inProcess: {
             controlable: false,
             header: 'อยู่ในเควส',
-            msg: 'กำลังเข้าร่วมเควส' + this.quest.name
+            msg: 'กำลังเข้าร่วมเควส "' + this.quest.name + '"',
+            data: this.quest.description
           }
         }
       )
-
       if (!this.quest.redo) {
         this.user.doneQuest.push(this.id)
       }
@@ -157,6 +170,27 @@ export default {
     isDone () {
       if (this.user.doneQuest.includes(this.id)) return true
       else return false
+    },
+    isFull () {
+      let count = 0
+      Object.keys(this.session).forEach((user) => {
+        if (this.session[user] === null) {
+          count += 1
+        }
+      })
+      if (Object.keys(this.session).length - count <= this.quest.max) {
+        return false
+      }
+      return true
+    },
+    playerCount () {
+      let count = 0
+      Object.keys(this.session).forEach((user) => {
+        if (this.session[user] === null) {
+          count += 1
+        }
+      })
+      return Object.keys(this.session).length - 1 - count
     }
   }
 }
@@ -194,48 +228,6 @@ export default {
   }
   .done {
     background-color: rgb(0, 121, 10);
-  }
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  min-height: 100vh;
-  background: rgba(0,0,0,0.8);
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .content {
-    width: 90vw;
-    max-width: 600px;
-    background: #fff;
-    border-radius: 0.25em;
-    position: relative;
-    display: block;
-  }
-  .img-info {
-    max-width: 250px;
-    height: auto;
-  }
-  .desc {
-    margin-top: 2px;
-  }
-  .btn-group {
-    margin-bottom: 3px;
-    .btn {
-      margin: 3px;
-      float: left;
-      position: relative;
-      display: block;
-      border: none;
-      padding: 1em 2em;
-      color: #fff;
-      border-radius: 0.25em;
-      text-align: center;
-    }
   }
 }
 </style>

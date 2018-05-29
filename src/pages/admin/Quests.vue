@@ -23,7 +23,8 @@
           <tbody>
             <tr v-for="(quest, key) in quests" :key="key">
               <td class="text-left">
-                <span class="text-primary">{{key}}</span> | {{quest.name}}
+                <span class="text-primary">{{key}}</span> | {{quest.name}}<br>
+                <p :class="['mb-0', {'text-info': quest.quest === 'extra'}, {'text-danger': quest.quest === 'event'}]">:{{ quest.quest }}</p>
               </td>
               <td>
                 {{quest.description}}
@@ -419,6 +420,9 @@ export default {
       this.add.max = 0
     },
     addQuest () {
+      if (this.add.max.length === 0) {
+        this.add.max = 1
+      }
       let payload = {}
       payload.name = this.add.name
       payload.description = this.add.description
@@ -434,7 +438,7 @@ export default {
       payload.role = this.add.role
       payload.max = parseInt(this.add.max)
       firestore().collection('quests').doc(this.nextId).set(payload)
-      firestore().collection('sessions').doc(this.nextId).set({})
+      firestore().collection('sessions').doc(this.nextId).set({playing: false})
       this.clearAddQuest()
     },
     prepareEditQuest (item, key) {
@@ -471,6 +475,9 @@ export default {
       this.edit.max = 0
     },
     editQuest () {
+      if (this.edit.max.length === 0) {
+        this.edit.max = 1
+      }
       let payload = {}
       payload.name = this.edit.name
       payload.description = this.edit.description
@@ -504,6 +511,7 @@ export default {
     },
     deleteQuest () {
       firestore().collection('quests').doc(this.deleting.id).delete()
+      firestore().collection('sessions').doc(this.deleting.id).delete()
       this.clearDeleteQuest()
     },
     validateEnergy (el) {
@@ -529,6 +537,9 @@ export default {
     getPrizePayload (prize) {
       let tmp = {}
       prize.map((item) => {
+        if (item.count.length === 0) {
+          item.count = 1
+        }
         tmp[item.id] = parseInt(item.count)
       })
       return tmp
@@ -536,6 +547,9 @@ export default {
     getRequiredItemPayload (requiredItem) {
       let tmp = {}
       requiredItem.map((item) => {
+        if (item.count.length === 0) {
+          item.count = 1
+        }
         tmp[item.id] = parseInt(item.count)
       })
       return tmp

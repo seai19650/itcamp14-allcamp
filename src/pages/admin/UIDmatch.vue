@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid">
+  <div v-if="users" class="container-fluid">
     <div class="container" ref="uidform" id="uid-input">
       <div class="row pt-5">
         <div class="col">
@@ -8,10 +8,10 @@
         <div class="col">
           <div class="row justify-content-end">
             <div class="col-auto">
-              <button v-if="isRandomed" @click="saveRoles" class="btn btn btn-success">Save Setting</button>
+              <button v-if="isRandomed" @click="saveRoles" class="btn btn btn-success">Save Player Setting</button>
             </div>
             <div class="col-auto">
-              <button @click="randomAssign" class="btn btn-info">Random Setting</button>
+              <button @click="randomAssign" v-if="!areAllRandomed" class="btn btn-info">Random Player Setting</button>           
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@
           <thead>
             <tr>
               <td>ID</td>
-              <th>UID</th>
+              <th style="width: 230px">UID</th>
               <th>Role</th>
               <th>House</th>
               <th>Camp</th>
@@ -62,27 +62,38 @@
             </tr>
             <tr v-for="(user, key) in users" v-if="user.house === house && user.player" :key="key">
               <td>{{ user.numId }}</td>
-              <td>{{ key }}</td>
+              <td>
+                <p class="mb-0">{{ key }}</p>
+                <p v-if="userDetail[key] !== undefined" class="text-primary">{{ userDetail[key].name }}</p>
+                <p v-else class="text-danger">no matching</p>
+              </td>
               <td>{{ user.role }}</td>
               <td>{{ user.house }}</td>
               <td>{{ user.camp }}</td>
               <td>
-                <button @click="deleteUIDData(key)" class="btn btn-danger">ลบ</button>
+                <button v-if="userDetail[key] === undefined" @click="deleteUIDData(key)" class="btn btn-danger">ลบ</button>
               </td>
             </tr>
           </tbody>
           <tbody>
             <tr class="table-section">
-              <td colspan="6"><h3 class="text-capitalize mb-0">Admin/Controller</h3></td>
+              <td colspan="3"><h3 class="text-capitalize mb-0">Admin/Controller</h3></td>
+              <td colspan="3">
+                <button @click="adminAssign" class="btn btn-info float-right">Random Admin Setting</button>                
+              </td>
             </tr>
             <tr v-for="(core, key) in users" v-if="!core.player" :key="key">
               <td>{{ core.numId }}</td>
-              <td>{{ key }}</td>
+              <td>
+                <p class="mb-0">{{ key }}</p>                
+                <p v-if="userDetail[key] !== undefined" class="text-primary">{{ userDetail[key].name }}</p>
+                <p v-else class="text-danger">no matching</p>
+              </td>
               <td class="text-muted nope">{{ core.role }}</td>
               <td class="text-muted nope">{{ core.house }}</td>
               <td class="text-muted nope">{{ core.camp }}</td>
               <td class="text-muted nope">
-                <button @click="deleteUIDData(key)" class="btn btn-danger">ลบ</button>
+                <button v-if="userDetail[key] === undefined" @click="deleteUIDData(key)" class="btn btn-danger">ลบ</button>
               </td>
             </tr>
           </tbody>
@@ -113,13 +124,26 @@ export default {
       roles: ['สายลับ', 'นักสะกดจิต', 'นักบิน', 'มือปืน'],
       houses: ['drop', 'pro', 're', 'tire'],
       camps: ['APPLIDANUS', 'I-OPOLLO', 'NETWORK STELLAR', 'GAME ORION', 'DTA48'],
-      isRandomed: false
+      isRandomed: false,
+      userDetail: null
     }
   },
   mounted () {
+    this.getUsers()
     this.getUIDData()
   },
   methods: {
+    getUsers () {
+      firestore().collection('users').onSnapshot(snapshot => {
+        let tmp = {}
+        snapshot.forEach(doc => {
+          tmp[doc.id] = doc.data()
+        })
+        this.userDetail = tmp
+      }, err => {
+        console.log(`Encountered error: ${err}`)
+      })
+    },
     getUIDData () {
       firestore().collection('uid-matching').onSnapshot(users => {
         let tmp = {}
@@ -154,7 +178,6 @@ export default {
         payload.camp = this.add.camp
       }
       firestore().collection('uid-matching').doc(this.add.key).set(payload)
-
       firestore().collection('users').doc(this.add.key).get().then(user => {
         if (user.exists) {
           firestore().collection('users').doc(user.id).update({
@@ -165,7 +188,6 @@ export default {
           })
         }
       })
-
       this.add = {
         key: '',
         role: '',
@@ -173,13 +195,22 @@ export default {
         camp: ''
       }
     },
+    adminAssign () {
+      Object.keys(this.users).forEach((key) => {
+        if (this.users[key].numId === undefined && !this.users[key].player) {
+          this.users[key]['numId'] = this.getFormatAccId(this.nextId)
+          this.nextId += 1
+          firestore().collection('uid-matching').doc(key).update({numId: this.users[key].numId})
+        }
+      })
+    },
     randomAssign () {
       let drop = []
       let pro = []
       let re = []
       let tire = []
       Object.keys(this.users).forEach((key) => {
-        if (this.users[key].numId === undefined) {
+        if (this.users[key].numId === undefined && this.users[key].player) {
           this.users[key]['numId'] = this.getFormatAccId(this.nextId)
           this.nextId += 1
         }
@@ -266,6 +297,17 @@ export default {
           return '00' + nextId
         }
       }
+    }
+  },
+  computed: {
+    areAllRandomed () {
+      let state = true
+      Object.keys(this.users).forEach((key) => {
+        if (this.users[key].numId === undefined && this.users[key].player) {
+          state = false
+        }
+      })
+      return state
     }
   }
 }
