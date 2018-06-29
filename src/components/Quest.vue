@@ -1,5 +1,5 @@
 <template>
-  <div v-if="energy" class="quest row">
+  <div v-if="energy !== null" class="quest row">
     <div class="pl-2 col-9 name text-left">
       <span class="text-info">{{ id }}</span> | {{quest.name}}
     </div>

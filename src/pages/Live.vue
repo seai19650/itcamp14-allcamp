@@ -3,24 +3,24 @@
     <div ref="bar" id="house-status" class="container-fluid">
       <div class="row py-3">
         <div class="col mx-1 status">
-          <p class="mb-0 mt-1">Drop : energy</p>
+          <h2 style="color: #8A2BE2" class="mt-1">Drop : Energy</h2>
           <hr class="my-1">
-          <h3>{{formatEnergy(dropValue)}}</h3>
+          <h2>{{formatEnergy(dropValue)}}</h2>
         </div>
         <div class="col mx-1 status">
-          <p class="mb-0 mt-1">Pro : energy</p>
+          <h2 style="color: #1E90FF" class="mt-1">Pro : Energy</h2>
           <hr class="my-1">
-          <h3>{{formatEnergy(proValue)}}</h3>
+          <h2>{{formatEnergy(proValue)}}</h2>
         </div>
         <div class="col mx-1 status">
-          <p class="mb-0 mt-1">Re : energy</p>
+          <h2 style="color: #FF0000" class="mt-1">Re : Energy</h2>
           <hr class="my-1">
-          <h3>{{formatEnergy(reValue)}}</h3>
+          <h2>{{formatEnergy(reValue)}}</h2>
         </div>
         <div class="col mx-1 status">
-          <p class="mb-0 mt-1">Tire : energy</p>
+          <h2 style="color: #32CD32" class="mt-1">Tire : Energy</h2>
           <hr class="my-1">
-          <h3>{{formatEnergy(tireValue)}}</h3>
+          <h2>{{formatEnergy(tireValue)}}</h2>
         </div>
       </div>
     </div>
@@ -36,14 +36,42 @@
             <hr>
             <div class="row">
               <div class="col">
-                <p>{{quest.description}}</p>
+                <p class="mb-0 desc-quest">{{quest.description}}</p>
               </div>
             </div>
             <hr>
             <div class="row">
               <div class="col">
-                <p class="mb-0 text-info">Quest Code</p>
-                <h2>{{key}}</h2>
+                <p class="mb-0 text-info">สถานที่</p>
+                <p class="mb-0">{{quest.place}}</p>
+              </div>
+              <div class="col">
+                <p class="mb-0 text-info">NPC</p>
+                <p class="mb-0">{{quest.npc}}</p>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col">
+                <p class="mb-0 text-info">ไอเทมที่ต้องการ</p>
+                <p class="mb-0" v-if="quest.requiredItem.length !== 0" v-for="item in quest.requiredItem" :key="item.id">{{ item.name }} : {{ item.count }}</p>
+                <p class="text-muted" v-if="quest.requiredItem.length === 0">ไม่มีไอเทมที่ต้องการ</p>
+              </div>
+              <div class="col">
+                <p class="mb-0 text-info">Energy ที่ต้องการ</p>
+                <p class="mb-0">{{quest.requiredEnergy}}</p>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col">
+                <p class="mb-0 text-info">หน่วยงานที่ทำได้</p>
+                <p v-if="quest.role !== false">{{ quest.role }}</p>
+                <p v-else>ไม่จำกัด</p>
+              </div>
+              <div class="col">
+                <p class="mb-0 text-info">จำนวนคนที่อยู่ในเควส</p>
+                <p class="mb-0">{{ countPlayer(key) }}:{{quest.max}}</p>
               </div>
             </div>
           </div>
@@ -67,7 +95,8 @@ export default {
       users: {},
       quests: {},
       items: {},
-      systemEnv: {}
+      systemEnv: {},
+      sessions: {}
     }
   },
   mounted () {
@@ -75,9 +104,19 @@ export default {
     this.getUsers()
     this.getItems()
     this.getQuests()
+    this.getSessions()
     this.$refs.outer.style.paddingTop = this.$refs.bar.scrollHeight + 'px'
   },
   methods: {
+    getSessions () {
+      firestore().collection('sessions').onSnapshot(sessions => {
+        let tmp = {}
+        sessions.forEach((session) => {
+          tmp[session.id] = session.data()
+        })
+        this.sessions = tmp
+      })
+    },
     formatEnergy(energy) {
       return energy.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     },
@@ -140,6 +179,15 @@ export default {
         })
         this.systemEnv = tmp
       })
+    },
+    countPlayer (id) {
+      let count = 0
+      Object.keys(this.sessions[id]).forEach((prop) => {
+        if (this.sessions[id][prop] !== null && prop !== 'playing') {
+          count++
+        }
+      })
+      return count
     }
   },
   computed: {
@@ -166,6 +214,7 @@ export default {
   top: 0;
   left: 0;
   background: #fff;
+  box-shadow: 0px 2px 5px rgb(58, 58, 58);
   .status {
     background: rgb(221, 221, 221);
     border-radius: 10px;
@@ -176,7 +225,7 @@ export default {
 	column-width: 320px;
 	column-gap: 15px;
   width: 95%;
-	max-width: 1200px;
+	max-width: 95vw;
   margin: 20px auto;
   & figure {
     width: 100%;
@@ -197,5 +246,9 @@ export default {
 @media screen and (max-width: 750px) { 
   #columns { column-gap: 0px; }
   #columns figure { width: 100%; }
+}
+
+.desc-quest {
+  font-size: 1.3em;
 }
 </style>

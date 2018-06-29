@@ -16,10 +16,15 @@
     <h2>เควสเสริม</h2>
     <div class="row">
       <div class="col-9 pr-0">
-        <input placeholder="extra quest code" class="form-styling" type="text" name="quest-code" id="quest-code" v-model="extraQuestId">
+        <input @focus="extraQuest = null" placeholder="extra quest code" class="form-styling" type="text" name="quest-code" id="quest-code" v-model="extraQuestId">
       </div>
       <div class="col-3 pl-0">
         <span @click="findExtraQuest" class="find"><p class="mb-0 w-100 text-center">Find</p></span>        
+      </div>
+    </div>
+    <div v-if="questError !== null" class="row">
+      <div class="col">
+        <p>{{ questError }}</p>
       </div>
     </div>
     <quest
@@ -59,8 +64,14 @@ export default {
   methods: {
     findExtraQuest () {
       if (this.quests[this.extraQuestId] !== undefined && this.quests[this.extraQuestId].quest !== 'main') {
-        this.extraQuest = this.quests[this.extraQuestId] 
-        this.questError = null
+        if (!this.quests[this.extraQuestId].role || this.quests[this.extraQuestId].role === this.userRole) {
+          this.extraQuest = this.quests[this.extraQuestId] 
+          this.questError = null
+        } else {
+          this.extraQuest = null
+          this.questError = 'ไม่สามารถทำเควสนี้ได้'
+        }
+        
       } else {
         this.extraQuest = null
         this.questError = 'ไม่พบเควส'
