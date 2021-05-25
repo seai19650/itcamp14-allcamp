@@ -1,6 +1,12 @@
-# itcamp-sys
+# Game System for IT Camp 14
 
 > Trading and Exchange system for ITCamp14
+
+![34670833_386969211787598_4365235804230909952_n](https://user-images.githubusercontent.com/20513364/119539512-759f3e00-bdb6-11eb-83a2-edd89858e733.jpg)
+![34711257_386968785120974_320597266874236928_n](https://user-images.githubusercontent.com/20513364/119540438-a633a780-bdb7-11eb-80a9-83ef1f7129af.jpg)
+
+
+For more info about this activity. Please check out my [medium](https://medium.com/itforge-eros/ว่าด้วยเรื่องระบบ-all-camp-it-camp-14-5d3494d2c4b4)! (Thai language)
 
 ## Build Setup
 
